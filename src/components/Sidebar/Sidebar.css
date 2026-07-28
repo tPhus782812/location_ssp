@@ -1,0 +1,137 @@
+.sidebar{
+
+    position:fixed;
+
+    left:0;
+
+    top:0;
+
+    width:280px;
+
+    height:100vh;
+
+    background:linear-gradient(
+        180deg,
+        #0F172A,
+        #1E293B
+    );
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:30px 20px;
+
+    box-shadow:
+        10px 0 30px rgba(0,0,0,.15);
+
+    z-index:999;
+
+}
+
+/* ======================= */
+
+.logo{
+
+    color:white;
+
+    text-align:center;
+
+    font-size:28px;
+
+    font-weight:800;
+
+    margin-bottom:40px;
+
+}
+
+/* ======================= */
+
+.sidebar a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    color:#CBD5E1;
+
+    padding:16px;
+
+    margin-bottom:8px;
+
+    border-radius:16px;
+
+    transition:.25s;
+
+    font-weight:600;
+
+}
+
+/* ======================= */
+
+.sidebar a:hover{
+
+    background:#2563EB;
+
+    color:white;
+
+    transform:translateX(5px);
+
+}
+
+/* ======================= */
+
+.sidebar a.active{
+
+    background:#2563EB;
+
+    color:white;
+
+    box-shadow:
+        0 10px 30px rgba(37,99,235,.35);
+
+}
+
+/* ======================= */
+
+.sidebar svg{
+
+    font-size:20px;
+
+}
+
+.logo{
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+margin-bottom:45px;
+
+}
+
+.logo h2{
+
+margin-top:12px;
+
+font-size:24px;
+
+font-weight:800;
+
+color:white;
+
+}
+
+.logo p{
+
+color:#94A3B8;
+
+margin-top:6px;
+
+font-size:14px;
+
+}

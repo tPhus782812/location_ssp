@@ -1,0 +1,45 @@
+.layout{
+    display:flex;
+    min-height:100vh;
+    background:#F4F7FC;
+}
+
+/* ========================= */
+
+.content{
+
+    flex:1;
+
+    margin-left:280px;
+
+    min-height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* ========================= */
+
+.page{
+
+    flex:1;
+
+    padding:30px;
+
+    overflow:auto;
+
+}
+
+/* ========================= */
+
+@media(max-width:900px){
+
+    .content{
+
+        margin-left:0;
+
+    }
+
+}

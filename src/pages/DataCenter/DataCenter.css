@@ -1,0 +1,53 @@
+.data-page{
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
+
+.data-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.data-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.data-table th{
+    background:#2563EB;
+    color:white;
+    padding:16px;
+}
+
+.data-table td{
+    padding:16px;
+    border-bottom:1px solid #eee;
+}
+
+.data-table tr:hover{
+    background:#F8FAFC;
+}
+
+.delete-btn{
+    padding:8px 15px;
+    background:#DC2626;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.danger-btn{
+    padding:12px 20px;
+    background:#DC2626;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
