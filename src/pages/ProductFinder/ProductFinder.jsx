@@ -398,7 +398,7 @@ function ProductFinder() {
 
           <div className="family-wrapper">
 
-            <h2>🔄 SẢN PHẨM CÙNG MẪU</h2>
+            <h2>🔄 SẢN PHẨM KHÁC MÀU </h2>
 
             <div className="family-grid">
 
