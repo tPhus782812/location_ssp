@@ -108,3 +108,25 @@
     color:#94A3B8;
 
 }
+
+/* ============================= */
+/* Mobile */
+/* ============================= */
+
+@media (max-width:900px){
+
+.sidebar{
+
+    transform:translateX(-100%);
+
+    transition:.3s;
+
+}
+
+.sidebar.open{
+
+    transform:translateX(0);
+
+}
+
+}

@@ -197,12 +197,6 @@ await loadDashboard();
 
     <div>
 
-        <h1>
-
-            Warehouse Dashboard
-
-        </h1>
-
     </div>
 
 </div>
@@ -297,7 +291,7 @@ await loadDashboard();
           className="generate-btn"
           onClick={handleGenerate}
         >
-          🚀 Generate Product Master
+          🚀 Xác nhận
         </button>
       </div>
     </div>

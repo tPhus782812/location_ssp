@@ -4,6 +4,7 @@ import ProductCard from "../../components/ProductCard/ProductCard";
 
 import { getProductMaster } from "../../services/storageService";
 
+import CameraScanner from "../../components/CameraScanner/CameraScanner";
 import {
   searchProducts,
   getSkuSizes,
@@ -42,8 +43,9 @@ function ProductFinder() {
   // Các SKU cùng model
   const [modelSkus, setModelSkus] = useState([]);
 
-  const [totalStock,setTotalStock]=useState(0);
+  const [totalStock, setTotalStock] = useState(0);
 
+  const [cameraMode, setCameraMode] = useState(false);
 
   // ==========================
   // Load Product Master
@@ -88,7 +90,7 @@ function ProductFinder() {
 
     if (!master) return;
 
-    const key = keyword.trim();
+    const key = (scanCode || keyword).trim();
 
     if (key === "") {
 
@@ -153,9 +155,9 @@ function ProductFinder() {
       inputRef.current?.focus();
 
     }, 50);
-    const stock=getSkuTotalStock(master,product);
+    const stock = getSkuTotalStock(master, product);
 
-setTotalStock(stock);
+    setTotalStock(stock);
 
   }
 
@@ -234,36 +236,40 @@ setTotalStock(stock);
     inputRef.current?.focus();
     setTotalStock(
 
-        getSkuTotalStock(master,product)
+      getSkuTotalStock(master, product)
 
     );
 
   }
 
-  
+  function onCameraScan(code) {
+
+    setKeyword(code);
+
+    setTimeout(() => {
+
+      doSearch(code);
+
+    }, 100);
+
+  }
+
+
 
 
   // ==========================
 
   return (
-
     <div className="finder-page">
 
-      {/* ========================= */}
-      {/* Header */}
-      {/* ========================= */}
+      {/* ================= HEADER ================= */}
 
       <div className="finder-header">
-
         <h1>🔍 Tìm kiếm</h1>
-
         <p>Scan Barcode / Search SKU / Item Number</p>
-
       </div>
 
-      {/* ========================= */}
-      {/* Search */}
-      {/* ========================= */}
+      {/* ================= SEARCH ================= */}
 
       <div className="search-wrapper">
 
@@ -271,19 +277,20 @@ setTotalStock(stock);
           ref={inputRef}
           className="search-input"
           value={keyword}
-          placeholder="Scan Barcode..."
           autoFocus
+          placeholder="Scan Barcode..."
           onChange={(e) => setKeyword(e.target.value)}
           onKeyDown={(e) => {
-
-            if (e.key === "Enter") {
-
-              doSearch();
-
-            }
-
+            if (e.key === "Enter") doSearch();
           }}
         />
+
+        <button
+          className="camera-btn"
+          onClick={() => setCameraMode(!cameraMode)}
+        >
+          {cameraMode ? "📷 Đóng Camera" : "📷 Mở Camera"}
+        </button>
 
         <button
           className="clear-btn"
@@ -294,269 +301,161 @@ setTotalStock(stock);
 
       </div>
 
-      {/* ========================= */}
+      {/* ================= CAMERA ================= */}
+
+      {cameraMode && (
+        <div className="camera-wrapper">
+          <CameraScanner
+            onScan={onCameraScan}
+          />
+        </div>
+      )}
+
+      {/* ================= STATUS ================= */}
 
       <div className="finder-status">
-
         {status}
-
       </div>
 
-      {/* ========================= */}
-      {/* Product */}
-      {/* ========================= */}
+      {/* ================= EMPTY ================= */}
 
-      {
+      {!selectedProduct && (
 
-        !selectedProduct ?
+        <div className="empty-result">
 
-          (
+          <h2>📦 Xin mời scan</h2>
 
-            <div className="empty-result">
+          <p>
+            Sử dụng Camera hoặc máy Scan Barcode
+          </p>
 
-              <h2>
+        </div>
 
-                📦 Xin mời scan
+      )}
 
-              </h2>
+      {/* ================= PRODUCT ================= */}
 
-              {/* <p>
+      {selectedProduct && (
 
-                Scan Barcode & Search Name &  
+        <>
 
-              </p> */}
+          <ProductCard
+            product={selectedProduct}
+            totalStock={totalStock}
+          />
+
+          {/* ================= SIZE ================= */}
+
+          <div className="variant-section">
+
+            <h2>📏 Size</h2>
+
+            <div className="variant-grid">
+
+              {skuSizes.map((item) => (
+
+                <button
+                  key={item.barcode}
+                  className={
+                    item.barcode === selectedProduct.barcode
+                      ? "variant-btn active"
+                      : "variant-btn"
+                  }
+                  onClick={() => handleSizeClick(item)}
+                >
+
+                  <strong>{item.size}</strong>
+
+                  <br />
+
+                  <small>
+
+                    {item.stock > 0
+                      ? `📦 ${item.stock}`
+                      : "Out"}
+
+                  </small>
+
+                </button>
+
+              ))}
 
             </div>
 
-          )
+          </div>
 
-          :
+          {/* ================= COLOR ================= */}
 
-          (
+          <div className="variant-section">
 
-            <>
+            <h2>🎨 Color</h2>
 
-              <ProductCard
+            <div className="variant-grid">
 
-                product={selectedProduct}
-                totalStock={totalStock}
+              {colorVariants.map((item) => (
 
-              />
-
-              {/* ========================= */}
-              {/* Size */}
-              {/* ========================= */}
-
-              <div className="variant-section">
-
-                <h2>
-
-                  📏 Size
-
-                </h2>
-
-                <div className="variant-grid">
-
-                  {
-
-                    skuSizes.map(item => (
-
-                      <button
-
-                        key={item.barcode}
-
-                        className={
-
-                          item.barcode === selectedProduct.barcode
-
-                            ?
-
-                            "variant-btn active"
-
-                            :
-
-                            "variant-btn"
-
-                        }
-
-                        onClick={() =>
-
-                          handleSizeClick(item)
-
-                        }
-
-                      >
-
-                        <strong>
-
-                          {item.size}
-
-                        </strong>
-
-                        <br />
-
-                        {item.stock > 0
-
-                          ?
-
-                          `${item.stock}`
-
-                          :
-
-                          "Out"
-
-                        }
-
-                      </button>
-
-                    ))
-
+                <button
+                  key={item.product.barcode}
+                  className={
+                    item.product.barcode === selectedProduct.barcode
+                      ? "variant-btn active"
+                      : "variant-btn"
                   }
+                  onClick={() => handleColorClick(item)}
+                >
 
-                </div>
+                  {item.color}
 
-              </div>
+                </button>
 
-              {/* ========================= */}
-              {/* Color */}
-              {/* ========================= */}
+              ))}
 
-              <div className="variant-section">
+            </div>
 
-                <h2>
+          </div>
 
-                  🎨 Color
+          {/* ================= RELATED SKU ================= */}
 
-                </h2>
+          <div className="family-wrapper">
 
-                <div className="variant-grid">
+            <h2>🔄 SẢN PHẨM CÙNG MẪU</h2>
 
-                  {
+            <div className="family-grid">
 
-                    colorVariants.map(item => (
+              {modelSkus
+                .filter(
+                  (item) =>
+                    item.searchName !== selectedProduct.searchName
+                )
+                .map((item) => (
 
-                      <button
+                  <div
+                    key={item.searchName}
+                    className="family-card"
+                    onClick={() => handleSkuClick(item)}
+                  >
 
-                        key={item.product.barcode}
+                    <h3>{item.searchName}</h3>
 
-                        className={
+                    <p>{item.color}</p>
 
-                          item.product.barcode === selectedProduct.barcode
+                    <p>{item.totalSize} Size</p>
 
-                            ?
+                    <p>📦 {item.totalStock}</p>
 
-                            "variant-btn active"
+                  </div>
 
-                            :
+                ))}
 
-                            "variant-btn"
+            </div>
 
-                        }
+          </div>
 
-                        onClick={() =>
+        </>
 
-                          handleColorClick(item)
-
-                        }
-
-                      >
-
-                        {item.color}
-
-                      </button>
-
-                    ))
-
-                  }
-
-                </div>
-
-              </div>
-
-              {/* ========================= */}
-              {/* Related SKU */}
-              {/* ========================= */}
-
-              <div className="family-wrapper">
-
-                <h2>
-
-                  SẢN PHẨM CÙNG MÀU
-
-                </h2>
-
-                <div className="family-grid">
-
-                  {
-
-                    modelSkus
-
-                      .filter(
-
-                        item =>
-
-                          item.searchName !== selectedProduct.searchName
-
-                      )
-
-                      .map(item => (
-
-                        <div
-
-                          key={item.searchName}
-
-                          className="family-card"
-
-                          onClick={() =>
-
-                            handleSkuClick(item)
-
-                          }
-
-                        >
-
-                          <h3>
-
-                            {item.searchName}
-
-                          </h3>
-
-                          <p>
-
-                            {item.color}
-
-                          </p>
-
-                          <p>
-
-                            {item.totalSize} Size
-
-                          </p>
-
-                          <p>
-
-                            📦 {item.totalStock}
-
-                          </p>
-
-                        </div>
-
-                      ))
-
-                  }
-
-                </div>
-
-              </div>
-
-            </>
-
-          )
-
-      }
+      )}
 
     </div>
-
   );
 
 }

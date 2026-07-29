@@ -583,3 +583,61 @@ color:white;
 color:white;
 
 }
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width:768px){
+
+.product-card{
+
+    padding:18px;
+
+}
+
+.hero-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.hero-card{
+
+    padding:18px;
+
+}
+
+.hero-card h2{
+
+    font-size:26px;
+
+}
+
+.detail-grid{
+
+    grid-template-columns:1fr;
+
+}
+
+.color-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+}
+
+.size-grid{
+
+    grid-template-columns:repeat(4,1fr);
+
+}
+
+.color-btn{
+
+    justify-content:center;
+
+}
+
+}
