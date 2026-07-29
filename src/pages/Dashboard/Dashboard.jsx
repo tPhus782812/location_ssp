@@ -200,48 +200,6 @@ await loadDashboard();
     </div>
 
 </div>
-      <h1>Warehouse Dashboard</h1>
-
-      {/* Dashboard */}
-
-      {/* <div className="dashboard-grid">
-
-        <DashboardCard
-          title="Products"
-          value={stats.products.toLocaleString()}
-          icon={<FaBoxOpen />}
-          color="#2563eb"
-        />
-
-        <DashboardCard
-          title="Locations"
-          value={stats.locations.toLocaleString()}
-          icon={<FaMapMarkerAlt />}
-          color="#16a34a"
-        />
-
-        <DashboardCard
-          title="Barcode"
-          value={stats.barcode.toLocaleString()}
-          icon={<FaBarcode />}
-          color="#ea580c"
-        />
-
-        <DashboardCard
-          title="Stock"
-          value={stats.stock.toLocaleString()}
-          icon={<FaWarehouse />}
-          color="#7c3aed"
-        />
-
-      </div> */}
-
-      {/* Upload */}
-{/* 
-      <h2 className="upload-title">
-        📂 Upload Center
-      </h2> */}
-
       <div className="upload-grid">
 
         <div>

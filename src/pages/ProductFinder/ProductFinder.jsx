@@ -272,12 +272,12 @@ function ProductFinder() {
           {cameraMode ? "📷 Đóng Camera" : "📷 Mở Camera"}
         </button>
 
-        <button
+        {/* <button
           className="clear-btn"
           onClick={clearSearch}
         >
           Xóa
-        </button>
+        </button> */}
 
       </div>
 
@@ -352,7 +352,7 @@ function ProductFinder() {
 
                     {item.stock > 0
                       ? `📦 ${item.stock}`
-                      : "Out"}
+                      : "Oder"}
 
                   </small>
 

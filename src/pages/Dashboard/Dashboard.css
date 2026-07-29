@@ -1,66 +1,79 @@
-.dashboard-page{
+.dashboard-page {
 
     display:flex;
-
     flex-direction:column;
-
     gap:30px;
 
+    width:100%;
+    min-height:100vh;
+    padding:24px;
+    box-sizing:border-box;
+
 }
 
-.dashboard-title{
+
+/* TITLE */
+
+.dashboard-title {
 
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
 
 }
 
-.dashboard-title h1{
+
+.dashboard-title h1 {
 
     font-size:36px;
-
     font-weight:800;
-
     color:#111827;
 
 }
 
-.dashboard-grid{
+
+/* DASHBOARD CARD */
+
+.dashboard-grid {
 
     display:grid;
 
     grid-template-columns:
-        repeat(auto-fit,minmax(270px,1fr));
+    repeat(auto-fit,minmax(250px,1fr));
 
     gap:25px;
 
 }
 
-.upload-title{
+
+/* UPLOAD */
+
+.upload-title {
 
     font-size:26px;
-
     font-weight:700;
-
     margin-top:15px;
 
 }
 
-.upload-grid{
+
+.upload-grid {
 
     display:grid;
 
     grid-template-columns:
-        repeat(auto-fit,minmax(320px,1fr));
+    repeat(auto-fit,minmax(260px,1fr));
 
     gap:25px;
 
 }
 
-.generate-btn{
+
+/* BUTTON */
+
+.generate-btn {
 
     margin-top:25px;
 
@@ -81,14 +94,165 @@
     transition:.3s;
 
     box-shadow:
-        0 12px 30px rgba(37,99,235,.35);
+    0 12px 30px rgba(37,99,235,.35);
 
 }
 
-.generate-btn:hover{
+
+.generate-btn:hover {
 
     background:#1D4ED8;
-
     transform:translateY(-3px);
+
+}
+
+
+
+/* TABLET */
+
+@media(max-width:768px){
+
+
+.dashboard-page{
+
+    padding:16px;
+    gap:20px;
+
+}
+
+
+
+.dashboard-title{
+
+    justify-content:center;
+    text-align:center;
+
+}
+
+
+.dashboard-title h1{
+
+    font-size:28px;
+
+}
+
+
+
+.dashboard-grid,
+.upload-grid{
+
+
+    grid-template-columns:
+    repeat(2,1fr);
+
+    gap:16px;
+
+}
+
+
+
+.upload-card{
+
+    width:100%;
+    height:160px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+
+.upload-card img,
+.upload-card svg{
+
+    width:40px;
+    height:40px;
+
+}
+
+
+
+.upload-card h3{
+
+    font-size:15px;
+
+}
+
+
+
+.upload-card p{
+
+    font-size:13px;
+
+}
+
+
+.generate-btn{
+
+    width:100%;
+
+}
+
+
+
+}
+
+
+
+
+/* MOBILE */
+
+@media(max-width:480px){
+
+
+.dashboard-page{
+
+    padding:12px;
+
+}
+
+
+
+.dashboard-grid,
+.upload-grid{
+
+
+    grid-template-columns:
+    1fr;
+
+}
+
+
+
+.dashboard-title h1{
+
+    font-size:24px;
+
+}
+
+
+
+.upload-card{
+
+    height:150px;
+
+}
+
+
+
+.generate-btn{
+
+    font-size:16px;
+    padding:15px;
+
+}
+
+
 
 }
