@@ -86,80 +86,66 @@ function ProductFinder() {
   // Search
   // ==========================
 
-  function doSearch() {
+ function doSearch(scanCode = "") {
 
-    if (!master) return;
-
-    const key = (scanCode || keyword).trim();
-
-    if (key === "") {
-
-      clearSearch();
-
-      return;
-
+    if (!master) {
+        console.log("Master chưa load");
+        return;
     }
 
-    const result = searchProducts(master, key);
 
-    if (result.length === 0) {
+    const key = String(
+        scanCode || keyword
+    ).trim();
 
-      setSelectedProduct(null);
 
-      setSkuSizes([]);
+    console.log(
+        "Searching:",
+        key
+    );
 
-      setColorVariants([]);
 
-      setModelSkus([]);
+    const result = searchProducts(
+        master,
+        key
+    );
 
-      setStatus("❌ Product Not Found");
 
-      setKeyword("");
+    console.log(
+        "Result:",
+        result
+    );
 
-      inputRef.current?.focus();
 
-      return;
+    if(result.length===0){
 
+        setSelectedProduct(null);
+
+        setStatus(
+            "❌ Product Not Found"
+        );
+
+        return;
     }
 
-    const product = result[0];
 
-    setSelectedProduct(product);
+    const product=result[0];
 
-    // Size của đúng SKU
-    setSkuSizes(
-      getSkuSizes(master, product)
-    );
 
-    // Các màu cùng model
-    setColorVariants(
-      getColorVariants(master, product)
-    );
+    loadProduct(product);
 
-    // Các SKU cùng model
-    setModelSkus(
-      getModelSkus(master, product)
-    );
-
-    const totalStock = getSkuTotalStock(master, product);
 
     setStatus(
-      `✅ ${product.searchName}`
+        `✅ ${product.searchName}`
     );
 
 
-    setKeyword("");
+    setTimeout(()=>{
+        setKeyword("");
+        inputRef.current?.focus();
+    },100);
 
-    setTimeout(() => {
-
-      inputRef.current?.focus();
-
-    }, 50);
-    const stock = getSkuTotalStock(master, product);
-
-    setTotalStock(stock);
-
-  }
+}
 
   // ==========================
   // Clear
@@ -244,13 +230,7 @@ function ProductFinder() {
 
   function onCameraScan(code) {
 
-    setKeyword(code);
-
-    setTimeout(() => {
-
-      doSearch(code);
-
-    }, 100);
+    doSearch(code);
 
   }
 

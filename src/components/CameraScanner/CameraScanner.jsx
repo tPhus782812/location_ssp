@@ -1,5 +1,8 @@
 import { useEffect } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { 
+    Html5QrcodeScanner,
+    Html5QrcodeSupportedFormats
+} from "html5-qrcode";
 
 function CameraScanner({ onScan }) {
 
@@ -8,19 +11,41 @@ function CameraScanner({ onScan }) {
         const scanner = new Html5QrcodeScanner(
             "reader",
             {
-                fps: 10,
+                fps: 15,
+
                 qrbox: {
-                    width: 250,
-                    height: 120
+                    width: 280,
+                    height: 150
                 },
-                rememberLastUsedCamera: true
+
+                rememberLastUsedCamera: true,
+
+                formatsToSupport: [
+
+                    Html5QrcodeSupportedFormats.EAN_13,
+
+                    Html5QrcodeSupportedFormats.EAN_8,
+
+                    Html5QrcodeSupportedFormats.CODE_128,
+
+                    Html5QrcodeSupportedFormats.CODE_39,
+
+                    Html5QrcodeSupportedFormats.UPC_A,
+
+                    Html5QrcodeSupportedFormats.UPC_E
+
+                ]
+
             },
             false
         );
 
+
         scanner.render(
 
             (decodedText) => {
+
+                console.log("Barcode:", decodedText);
 
                 onScan(decodedText);
 
@@ -30,13 +55,17 @@ function CameraScanner({ onScan }) {
 
         );
 
+
         return () => {
 
-            scanner.clear().catch(() => {});
+            scanner.clear()
+                .catch(() => {});
 
         };
 
-    }, []);
+
+    }, [onScan]);
+
 
     return (
 
