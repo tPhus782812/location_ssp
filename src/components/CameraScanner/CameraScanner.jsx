@@ -85,46 +85,13 @@ function CameraScanner({ onScan }) {
             try {
 
 
-                const devices =
-                    await BrowserMultiFormatReader
-                        .listVideoInputDevices();
-
-
-
-                if (!devices.length) {
-
-                    console.log(
-                        "Không tìm thấy camera"
-                    );
-
-                    return;
-
-                }
-
-
-
-                // ưu tiên camera sau
-                const backCamera =
-                    devices.find(camera =>
-
-                        camera.label
-                            .toLowerCase()
-                            .includes("back")
-
-                        ||
-
-                        camera.label
-                            .toLowerCase()
-                            .includes("rear")
-
-                    );
-
-
-
-                const cameraId =
-                    backCamera?.deviceId
-                    ||
-                    devices[0].deviceId;
+                const constraints = {
+    video: {
+        facingMode: {
+            ideal: "environment"
+        }
+    }
+};
 
 
 
@@ -212,7 +179,7 @@ function CameraScanner({ onScan }) {
             }
 
 
-            catch(error){
+            catch (error) {
 
 
                 console.error(
@@ -259,7 +226,7 @@ function CameraScanner({ onScan }) {
 
             }
 
-            catch(error){
+            catch (error) {
 
 
                 console.log(
@@ -285,7 +252,7 @@ function CameraScanner({ onScan }) {
         <div
             className="camera-container"
             style={{
-                position:"relative"
+                position: "relative"
             }}
         >
 
@@ -296,11 +263,11 @@ function CameraScanner({ onScan }) {
 
                 style={{
 
-                    width:"100%",
+                    width: "100%",
 
-                    height:"100%",
+                    height: "100%",
 
-                    objectFit:"cover"
+                    objectFit: "cover"
 
                 }}
 
@@ -314,23 +281,23 @@ function CameraScanner({ onScan }) {
 
                 style={{
 
-                    position:"absolute",
+                    position: "absolute",
 
-                    top:"50%",
+                    top: "50%",
 
-                    left:"50%",
+                    left: "50%",
 
                     transform:
-                    "translate(-50%,-50%)",
+                        "translate(-50%,-50%)",
 
-                    width:"80%",
+                    width: "80%",
 
-                    height:"120px",
+                    height: "120px",
 
                     border:
-                    "3px solid #00ff66",
+                        "3px solid #00ff66",
 
-                    borderRadius:"12px"
+                    borderRadius: "12px"
 
                 }}
 
@@ -344,15 +311,15 @@ function CameraScanner({ onScan }) {
 
                 style={{
 
-                    position:"absolute",
+                    position: "absolute",
 
-                    bottom:"20px",
+                    bottom: "20px",
 
-                    width:"100%",
+                    width: "100%",
 
-                    textAlign:"center",
+                    textAlign: "center",
 
-                    color:"#fff"
+                    color: "#fff"
 
                 }}
 
