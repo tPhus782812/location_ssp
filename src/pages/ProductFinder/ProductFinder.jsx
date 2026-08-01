@@ -258,7 +258,7 @@ function ProductFinder() {
       getSkuTotalStock(master, product)
 
     );
-    inputRef.current?.focus();
+    // inputRef.current?.focus();
 
 
   }
