@@ -28,7 +28,7 @@ function MainLayout({ children }) {
             <div className="content">
 
                 <Header
-                    openSidebar={() => setSidebarOpen(true)}
+                    onMenuClick={() => setSidebarOpen(true)}
                 />
 
                 <main className="page">

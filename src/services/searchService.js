@@ -371,11 +371,7 @@ export function getProductBySku(masterData, sku) {
 
 export function getSkuTotalStock(masterData, product) {
 
-    if (!masterData || !product) {
-
-        return 0;
-
-    }
+    if (!masterData || !product) return 0;
 
     const list =
         masterData.index.sku[
@@ -384,9 +380,9 @@ export function getSkuTotalStock(masterData, product) {
 
     return list.reduce(
 
-        (total, item) =>
+        (sum, item) =>
 
-            total + Number(item.stock || 0),
+            sum + Number(item.stock || 0),
 
         0
 

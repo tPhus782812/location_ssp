@@ -1,33 +1,25 @@
 import "./Header.css";
 import { FaBars } from "react-icons/fa";
 
-function Header({ openSidebar }) {
+function Header({ onMenuClick }) {
 
     return (
 
         <header className="header">
+
             <button
-
                 className="menu-btn"
-
-                onClick={openSidebar}
-
+                onClick={onMenuClick}
+                aria-label="Open menu"
             >
-
                 <FaBars />
-
             </button>
-            {/* <div>
-
-                <h2>Warehouse Manager Pro</h2>
-
-            </div> */}
 
             <div className="header-right">
 
-                🔔
-
-                👤 Lê Thanh Phú
+                <div className="user-name">
+                    👤 Lê Thanh Phú
+                </div>
 
             </div>
 

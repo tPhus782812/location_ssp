@@ -2,9 +2,19 @@ import { useEffect, useRef, useState } from "react";
 
 import ProductCard from "../../components/ProductCard/ProductCard";
 
-import { getProductMaster } from "../../services/storageService";
+import {
+  getProductMaster,
+  getSelectedList,
+  saveSelectedList
+} from "../../services/storageService";
 
 import CameraScanner from "../../components/CameraScanner/CameraScanner";
+
+import SelectedList from "../../components/SelectedList/SelectedList";
+
+import { FaShoppingCart } from "react-icons/fa";
+
+
 import {
   searchProducts,
   getSkuSizes,
@@ -47,6 +57,12 @@ function ProductFinder() {
 
   const [cameraMode, setCameraMode] = useState(false);
 
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  const [showCart, setShowCart] = useState(false);
+
+
+
   // ==========================
   // Load Product Master
   // ==========================
@@ -55,11 +71,23 @@ function ProductFinder() {
 
     loadMaster();
 
+    loadSelected();
+
   }, []);
+
+  async function loadSelected() {
+
+    const list = await getSelectedList();
+
+    setSelectedItems(list || []);
+
+  }
 
   async function loadMaster() {
 
     const data = await getProductMaster();
+
+    console.log("Product Master:", data);
 
     if (!data) {
 
@@ -74,7 +102,7 @@ function ProductFinder() {
         ? data
         : data.data;
 
-    console.log("MASTER", masterData);
+    console.log("MASTER:", masterData);
 
     setMaster(masterData);
 
@@ -86,66 +114,66 @@ function ProductFinder() {
   // Search
   // ==========================
 
- function doSearch(scanCode = "") {
+  function doSearch(scanCode = "") {
 
     if (!master) {
-        console.log("Master chưa load");
-        return;
+      console.log("Master chưa load");
+      return;
     }
 
 
     const key = String(
-        scanCode || keyword
+      scanCode || keyword
     ).trim();
 
 
     console.log(
-        "Searching:",
-        key
+      "Searching:",
+      key
     );
 
 
     const result = searchProducts(
-        master,
-        key
+      master,
+      key
     );
 
 
     console.log(
-        "Result:",
-        result
+      "Result:",
+      result
     );
 
 
-    if(result.length===0){
+    if (result.length === 0) {
 
-        setSelectedProduct(null);
+      setSelectedProduct(null);
 
-        setStatus(
-            "❌ Product Not Found"
-        );
+      setStatus(
+        "❌ Product Not Found"
+      );
 
-        return;
+      return;
     }
 
 
-    const product=result[0];
+    const product = result[0];
 
 
     loadProduct(product);
 
 
     setStatus(
-        `✅ ${product.searchName}`
+      `✅ ${product.searchName}`
     );
 
 
-    setTimeout(()=>{
-        setKeyword("");
-        inputRef.current?.focus();
-    },100);
+    setTimeout(() => {
+      setKeyword("");
+      inputRef.current?.focus();
+    }, 100);
 
-}
+  }
 
   // ==========================
   // Clear
@@ -219,12 +247,13 @@ function ProductFinder() {
       getModelSkus(master, product)
     );
 
-    inputRef.current?.focus();
     setTotalStock(
 
       getSkuTotalStock(master, product)
 
     );
+    inputRef.current?.focus();
+
 
   }
 
@@ -234,7 +263,41 @@ function ProductFinder() {
 
   }
 
+  async function addToList(product) {
 
+    const newList = [...selectedItems];
+
+    const index = newList.findIndex(
+
+      item => item.barcode === product.barcode
+
+    );
+
+    if (index >= 0) {
+
+      newList[index].qty++;
+
+    }
+
+    else {
+
+      newList.push({
+
+        ...product,
+
+        qty: 1,
+
+        addedTime: new Date().toLocaleTimeString()
+
+      });
+
+    }
+
+    setSelectedItems(newList);
+
+    await saveSelectedList(newList);
+
+  }
 
 
   // ==========================
@@ -248,7 +311,29 @@ function ProductFinder() {
         <h1>🔍 Tìm kiếm</h1>
         <p>Scan Barcode / Search SKU / Item Number</p>
       </div>
+      <button
 
+        className="cart-btn"
+
+        onClick={() => setShowCart(true)}
+
+      >
+
+        <FaShoppingCart />
+
+        {
+
+          selectedItems.length > 0 &&
+
+          <span>
+
+            {selectedItems.length}
+
+          </span>
+
+        }
+
+      </button>
       {/* ================= SEARCH ================= */}
 
       <div className="search-wrapper">
@@ -323,12 +408,22 @@ function ProductFinder() {
             product={selectedProduct}
             totalStock={totalStock}
           />
+          <div className="add-list-wrapper">
+
+            <button
+              className="add-list-btn"
+              onClick={() => addToList(selectedProduct)}
+            >
+              ➕ Thêm vào danh sách
+            </button>
+
+          </div>
 
           {/* ================= SIZE ================= */}
 
           <div className="variant-section">
 
-            <h2>📏 Size</h2>
+            <h2>Size</h2>
 
             <div className="variant-grid">
 
@@ -368,7 +463,7 @@ function ProductFinder() {
 
           <div className="variant-section">
 
-            <h2>🎨 Color</h2>
+            <h2>Color</h2>
 
             <div className="variant-grid">
 
@@ -431,9 +526,44 @@ function ProductFinder() {
 
           </div>
 
+
+
         </>
 
       )}
+      <div>
+        {
+          showCart && (
+
+            <div
+              className="cart-overlay"
+              onClick={() => setShowCart(false)}
+            >
+
+              <div
+                className="cart-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+
+                <SelectedList
+                  items={selectedItems}
+                  setItems={async (list) => {
+
+                    setSelectedItems(list);
+
+                    await saveSelectedList(list);
+
+                  }}
+                  onClose={() => setShowCart(false)}
+                />
+
+              </div>
+
+            </div>
+
+          )
+        }
+      </div>
 
     </div>
   );

@@ -115,3 +115,20 @@ export async function exportDatabase() {
 
   return data;
 }
+
+export async function saveSelectedList(list) {
+
+    await saveData(
+        "selectedList",
+        list
+    );
+
+}
+
+export async function getSelectedList() {
+
+    return await getData(
+        "selectedList"
+    ) || [];
+
+}

@@ -1,6 +1,6 @@
 import "./ProductHero.css";
 
-function ProductHero({ product, totalStock={totalStock} }) {
+function ProductHero({ product, totalStock = { totalStock } }) {
 
     if (!product) return null;
 
@@ -8,57 +8,32 @@ function ProductHero({ product, totalStock={totalStock} }) {
 
         <div className="">
 
-           <div className="hero-header">
+            <div className="hero-header">
 
-    <h1 className="product-name">
+                <h1 className="product-name">
 
-        {product.productName}
+                    {product.productName}
 
-    </h1>
+                </h1>
 
-    <div className="sku-code">
+                <div className="sku-code">
 
-      SKU:  {product.searchName}     '<span> {totalStock} PCS</span> '   
+                    SKU:  {product.searchName}     '<span> {totalStock} PCS</span> '
 
-    </div>
-     <div className="sku-stock">
+                </div>
+                <div className="sku-stock">
 
-       
 
-    </div>
 
-</div>
+                </div>
 
-<div className="hero-price">
+            </div>
 
-    {Number(product.price).toLocaleString("vi-VN")} ₫
+            <div className="hero-price">
 
-</div>
+                {Number(product.price).toLocaleString("vi-VN")} ₫
 
-            {/* <div
-                className={
-                    Number(product.stock) > 0
-                        ? "hero-stock in"
-                        : "hero-stock out"
-                }
-            >
-
-                {
-
-                    Number(product.stock) > 0
-
-                        ?
-
-                        "IN STOCK"
-
-                        :
-
-                        "OUT OF STOCK"
-
-                }
-
-            </div> */}
-
+            </div>
         </div>
 
     );
