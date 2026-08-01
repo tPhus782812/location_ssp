@@ -1,145 +1,376 @@
-import { useEffect, useRef } from "react";
 import {
-    Html5Qrcode,
-    Html5QrcodeSupportedFormats
-} from "html5-qrcode";
+    BrowserMultiFormatReader
+} from "@zxing/browser";
+
+import {
+    BarcodeFormat,
+    DecodeHintType
+} from "@zxing/library";
+
+import {
+    useEffect,
+    useRef
+} from "react";
+
 
 function CameraScanner({ onScan }) {
 
-    const scannerRef = useRef(null);
+
+    const videoRef = useRef(null);
+
+    const controlsRef = useRef(null);
+
     const startedRef = useRef(false);
+
+    const lastScanRef = useRef("");
+
+    const lastTimeRef = useRef(0);
+
+
 
     useEffect(() => {
 
-        const html5QrCode = new Html5Qrcode("reader");
-        scannerRef.current = html5QrCode;
+
+        // tránh React StrictMode start camera 2 lần
+        if (startedRef.current) return;
+
+
+        startedRef.current = true;
+
+
+
+        const hints = new Map();
+
+
+
+        hints.set(
+            DecodeHintType.POSSIBLE_FORMATS,
+            [
+
+                BarcodeFormat.CODE_128,
+
+                BarcodeFormat.EAN_13,
+
+                BarcodeFormat.EAN_8,
+
+                BarcodeFormat.CODE_39,
+
+                BarcodeFormat.UPC_A,
+
+                BarcodeFormat.UPC_E
+
+            ]
+        );
+
+
+        // tăng khả năng đọc barcode khó
+        hints.set(
+            DecodeHintType.TRY_HARDER,
+            true
+        );
+
+
+
+        const codeReader =
+            new BrowserMultiFormatReader(
+                hints
+            );
+
+
+
 
         async function startScanner() {
 
+
             try {
 
-                const cameras = await Html5Qrcode.getCameras();
 
-                let cameraId;
+                const devices =
+                    await BrowserMultiFormatReader
+                        .listVideoInputDevices();
 
-                if (cameras.length > 0) {
 
-                    const backCamera = cameras.find(camera =>
-                        camera.label.toLowerCase().includes("back") ||
-                        camera.label.toLowerCase().includes("rear")
+
+                if (!devices.length) {
+
+                    console.log(
+                        "Không tìm thấy camera"
                     );
 
-                    cameraId = backCamera
-                        ? backCamera.id
-                        : cameras[cameras.length - 1].id;
+                    return;
 
                 }
 
-                await html5QrCode.start(
 
-                    cameraId || {
-                        facingMode: "environment"
-                    },
 
-                    {
+                // ưu tiên camera sau
+                const backCamera =
+                    devices.find(camera =>
 
-                        fps: 10,
+                        camera.label
+                            .toLowerCase()
+                            .includes("back")
 
-                        qrbox: {
+                        ||
 
-                            width: 320,
-                            height: 180
+                        camera.label
+                            .toLowerCase()
+                            .includes("rear")
 
-                        },
+                    );
 
-                        aspectRatio: 16 / 9,
 
-                        disableFlip: true,
 
-                        rememberLastUsedCamera: true,
+                const cameraId =
+                    backCamera?.deviceId
+                    ||
+                    devices[0].deviceId;
 
-                        formatsToSupport: [
 
-                            Html5QrcodeSupportedFormats.EAN_13,
-                            Html5QrcodeSupportedFormats.EAN_8,
-                            Html5QrcodeSupportedFormats.CODE_128,
-                            Html5QrcodeSupportedFormats.CODE_39,
-                            Html5QrcodeSupportedFormats.UPC_A,
-                            Html5QrcodeSupportedFormats.UPC_E
 
-                        ]
 
-                    },
+                const controls =
+                    await codeReader
+                        .decodeFromVideoDevice(
 
-                    (decodedText) => {
+                            cameraId,
 
-                        navigator.vibrate?.(60);
+                            videoRef.current,
 
-                        onScan(decodedText);
 
-                    },
+                            (result, error) => {
 
-                    () => { }
 
+                                if (!result) return;
+
+
+
+                                const barcode =
+                                    result.getText();
+
+
+
+                                const now =
+                                    Date.now();
+
+
+
+                                // chống scan trùng
+                                if (
+
+                                    barcode ===
+                                    lastScanRef.current
+
+                                    &&
+
+                                    now -
+                                    lastTimeRef.current
+                                    <
+                                    1500
+
+                                ) {
+
+                                    return;
+
+                                }
+
+
+
+                                lastScanRef.current =
+                                    barcode;
+
+
+                                lastTimeRef.current =
+                                    now;
+
+
+
+                                navigator
+                                    .vibrate
+                                    ?.(
+                                        60
+                                    );
+
+
+
+                                onScan(
+                                    barcode
+                                );
+
+
+                            }
+
+                        );
+
+
+
+                controlsRef.current =
+                    controls;
+
+
+
+            }
+
+
+            catch(error){
+
+
+                console.error(
+                    "Camera error:",
+                    error
                 );
 
-                startedRef.current = true;
 
             }
 
-            catch (err) {
-
-                console.error(err);
-
-            }
 
         }
 
+
+
+
         startScanner();
 
-        return async () => {
+
+
+
+
+        return () => {
+
 
             try {
 
+
                 if (
-                    scannerRef.current &&
-                    startedRef.current
+                    controlsRef.current
                 ) {
 
-                    await scannerRef.current.stop();
 
-                    await scannerRef.current.clear();
+                    controlsRef.current
+                        .stop();
+
+
+                    controlsRef.current =
+                        null;
+
 
                 }
 
-            }
-
-            catch (err) {
-
-                console.log(err);
 
             }
+
+            catch(error){
+
+
+                console.log(
+                    error
+                );
+
+
+            }
+
 
         };
 
+
+
     }, [onScan]);
+
+
+
+
 
     return (
 
-        <div className="camera-container">
+        <div
+            className="camera-container"
+            style={{
+                position:"relative"
+            }}
+        >
 
-            <div id="reader"></div>
 
-            <div className="scan-tip">
+            <video
 
-                Đưa Barcode vào giữa khung để quét
+                ref={videoRef}
+
+                style={{
+
+                    width:"100%",
+
+                    height:"100%",
+
+                    objectFit:"cover"
+
+                }}
+
+            />
+
+
+
+            <div
+
+                className="scan-box"
+
+                style={{
+
+                    position:"absolute",
+
+                    top:"50%",
+
+                    left:"50%",
+
+                    transform:
+                    "translate(-50%,-50%)",
+
+                    width:"80%",
+
+                    height:"120px",
+
+                    border:
+                    "3px solid #00ff66",
+
+                    borderRadius:"12px"
+
+                }}
+
+            />
+
+
+
+            <div
+
+                className="scan-tip"
+
+                style={{
+
+                    position:"absolute",
+
+                    bottom:"20px",
+
+                    width:"100%",
+
+                    textAlign:"center",
+
+                    color:"#fff"
+
+                }}
+
+            >
+
+                Đưa barcode vào vùng quét
+
 
             </div>
+
+
 
         </div>
 
     );
 
+
 }
+
 
 export default CameraScanner;
