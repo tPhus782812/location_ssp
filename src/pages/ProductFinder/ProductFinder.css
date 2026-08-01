@@ -789,6 +789,31 @@ animation:slideCart .3s;
 
 }
 
+.scan-again-btn{
+
+    position:absolute;
+
+    bottom:20px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    padding:10px 25px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#16a34a;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
 
 
 @keyframes scanMove {

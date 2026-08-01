@@ -1,4 +1,5 @@
-import {FaCameraRotate} from "react-icons/fa6";
+import { FaCameraRotate } from "react-icons/fa6";
+
 import {
     BrowserMultiFormatReader
 } from "@zxing/browser";
@@ -22,8 +23,6 @@ function CameraScanner({ onScan }) {
 
     const controlsRef = useRef(null);
 
-    const readerRef = useRef(null);
-
     const lastScanRef = useRef("");
 
     const lastTimeRef = useRef(0);
@@ -34,11 +33,73 @@ function CameraScanner({ onScan }) {
         useState("environment");
 
 
+    const [isScanning, setIsScanning] =
+        useState(true);
 
-    async function startScanner(mode) {
 
 
-        try {
+
+
+    // 🔊 tạo tiếng beep
+    function playBeep(){
+
+
+        const audioContext =
+            new AudioContext();
+
+
+        const oscillator =
+            audioContext.createOscillator();
+
+
+        const gainNode =
+            audioContext.createGain();
+
+
+
+        oscillator.type = "square";
+
+        oscillator.frequency.value = 900;
+
+
+        gainNode.gain.value = 0.1;
+
+
+
+        oscillator.connect(gainNode);
+
+        gainNode.connect(
+            audioContext.destination
+        );
+
+
+
+        oscillator.start();
+
+
+
+        setTimeout(()=>{
+
+
+            oscillator.stop();
+
+            audioContext.close();
+
+
+        },120);
+
+
+    }
+
+
+
+
+
+
+    async function startScanner(mode){
+
+
+        try{
 
 
             if(controlsRef.current){
@@ -50,6 +111,7 @@ function CameraScanner({ onScan }) {
 
 
             const hints = new Map();
+
 
 
             hints.set(
@@ -65,10 +127,12 @@ function CameraScanner({ onScan }) {
             );
 
 
+
             hints.set(
                 DecodeHintType.TRY_HARDER,
                 true
             );
+
 
 
 
@@ -77,9 +141,6 @@ function CameraScanner({ onScan }) {
                     hints
                 );
 
-
-            readerRef.current =
-                codeReader;
 
 
 
@@ -92,19 +153,36 @@ function CameraScanner({ onScan }) {
 
                         video:{
 
+
                             facingMode:{
+
+
                                 ideal: mode
+
+
                             },
+
 
                             width:{
+
+
                                 ideal:1280
+
+
                             },
 
+
                             height:{
+
+
                                 ideal:720
+
+
                             }
 
+
                         }
+
 
                     },
 
@@ -130,10 +208,12 @@ function CameraScanner({ onScan }) {
 
 
 
+
+                        // chống scan trùng
+
                         if(
 
-                            code ===
-                            lastScanRef.current
+                            code === lastScanRef.current
 
                             &&
 
@@ -150,6 +230,7 @@ function CameraScanner({ onScan }) {
 
 
 
+
                         lastScanRef.current =
                             code;
 
@@ -159,10 +240,39 @@ function CameraScanner({ onScan }) {
 
 
 
+
+                        // 🔊 beep
+
+                        playBeep();
+
+
+
+                        // 📳 rung
+
                         navigator.vibrate?.(60);
 
 
+
+
+                        // 📷 tắt camera
+
+                        if(
+                            controlsRef.current
+                        ){
+
+                            controlsRef.current.stop();
+
+                        }
+
+
+
+                        setIsScanning(false);
+
+
+
+
                         onScan(code);
+
 
 
                     }
@@ -172,22 +282,31 @@ function CameraScanner({ onScan }) {
 
 
 
+
             controlsRef.current =
                 controls;
 
 
+
         }
 
+
         catch(error){
+
 
             console.log(
                 "Camera error",
                 error
             );
 
+
         }
 
+
     }
+
+
+
 
 
 
@@ -195,9 +314,13 @@ function CameraScanner({ onScan }) {
     useEffect(()=>{
 
 
-        startScanner(
-            cameraMode
-        );
+        if(isScanning){
+
+            startScanner(
+                cameraMode
+            );
+
+        }
 
 
 
@@ -216,7 +339,10 @@ function CameraScanner({ onScan }) {
         };
 
 
-    },[cameraMode]);
+    },[cameraMode,isScanning]);
+
+
+
 
 
 
@@ -226,17 +352,39 @@ function CameraScanner({ onScan }) {
     function changeCamera(){
 
 
+
         setCameraMode(
             prev =>
+
                 prev === "environment"
+
                 ?
+
                 "user"
+
                 :
+
                 "environment"
         );
 
 
     }
+
+
+
+
+
+
+
+    function restartScanner(){
+
+
+        setIsScanning(true);
+
+
+    }
+
+
 
 
 
@@ -250,13 +398,19 @@ function CameraScanner({ onScan }) {
 
 
 
-            <video
+            {
+                isScanning &&
 
-                ref={videoRef}
+                <video
 
-                className="scanner-video"
+                    ref={videoRef}
 
-            />
+                    className="scanner-video"
+
+                />
+
+            }
+
 
 
 
@@ -277,7 +431,10 @@ function CameraScanner({ onScan }) {
                 </button>
 
 
+
             </div>
+
+
 
 
 
@@ -295,13 +452,31 @@ function CameraScanner({ onScan }) {
 
 
 
-            {/* <div className="scan-tip">
 
 
-                Đưa barcode vào giữa khung
+
+            {
+
+                !isScanning &&
 
 
-            </div> */}
+                <button
+
+                    className="scan-again-btn"
+
+                    onClick={restartScanner}
+
+                >
+
+                    Quét lại
+
+
+                </button>
+
+
+            }
+
+
 
 
 
@@ -309,6 +484,7 @@ function CameraScanner({ onScan }) {
 
 
     );
+
 
 }
 
