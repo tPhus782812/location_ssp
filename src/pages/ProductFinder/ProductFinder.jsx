@@ -13,6 +13,8 @@ import CameraScanner from "../../components/CameraScanner/CameraScanner";
 import SelectedList from "../../components/SelectedList/SelectedList";
 
 import { FaShoppingCart } from "react-icons/fa";
+import { FaCamera } from "react-icons/fa6";
+import { FaCameraRotate } from "react-icons/fa6";
 
 
 import {
@@ -354,7 +356,13 @@ function ProductFinder() {
           className="camera-btn"
           onClick={() => setCameraMode(!cameraMode)}
         >
-          {cameraMode ? " Đóng " : " Mở "}
+          {
+            cameraMode
+              ?
+              <FaCamera />
+              :
+              <FaCameraRotate />
+          }
         </button>
 
         {/* <button
