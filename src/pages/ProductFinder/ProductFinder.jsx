@@ -14,7 +14,7 @@ import SelectedList from "../../components/SelectedList/SelectedList";
 
 import { FaShoppingCart } from "react-icons/fa";
 import { FaCamera } from "react-icons/fa6";
-import { FaCameraRotate } from "react-icons/fa6";
+import { FaQrcode, FaBarcode } from "react-icons/fa6";
 
 
 import {
@@ -218,9 +218,13 @@ function ProductFinder() {
   // ==========================
 
   function handleSizeClick(product) {
-
     loadProduct(product);
 
+    setTimeout(() => {
+
+      document.activeElement?.blur();
+
+    }, 50);
 
   }
 
@@ -359,9 +363,9 @@ function ProductFinder() {
           {
             cameraMode
               ?
-              <FaCamera />
+              <FaQrcode />
               :
-              <FaCameraRotate />
+              <FaBarcode />
           }
         </button>
 
