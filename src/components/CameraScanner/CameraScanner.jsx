@@ -31,7 +31,7 @@ function CameraScanner({ onScan }) {
     useEffect(() => {
 
 
-        // tránh React StrictMode start camera 2 lần
+        // tránh React StrictMode mở camera 2 lần
         if (startedRef.current) return;
 
 
@@ -63,7 +63,7 @@ function CameraScanner({ onScan }) {
         );
 
 
-        // tăng khả năng đọc barcode khó
+
         hints.set(
             DecodeHintType.TRY_HARDER,
             true
@@ -79,6 +79,7 @@ function CameraScanner({ onScan }) {
 
 
 
+
         async function startScanner() {
 
 
@@ -86,21 +87,42 @@ function CameraScanner({ onScan }) {
 
 
                 const constraints = {
-    video: {
-        facingMode: {
-            ideal: "environment"
-        }
-    }
-};
+
+
+                    video: {
+
+
+                        // ép dùng camera sau
+                        facingMode: {
+                            ideal: "environment"
+                        },
+
+
+                        width: {
+                            ideal: 1280
+                        },
+
+
+                        height: {
+                            ideal: 720
+                        }
+
+
+                    }
+
+
+                };
 
 
 
 
                 const controls =
                     await codeReader
-                        .decodeFromVideoDevice(
+                        .decodeFromConstraints(
 
-                            cameraId,
+
+                            constraints,
+
 
                             videoRef.current,
 
@@ -108,7 +130,10 @@ function CameraScanner({ onScan }) {
                             (result, error) => {
 
 
-                                if (!result) return;
+
+                                if (!result)
+                                    return;
+
 
 
 
@@ -117,12 +142,14 @@ function CameraScanner({ onScan }) {
 
 
 
+
                                 const now =
                                     Date.now();
 
 
 
-                                // chống scan trùng
+
+                                // chống quét lặp
                                 if (
 
                                     barcode ===
@@ -143,12 +170,16 @@ function CameraScanner({ onScan }) {
 
 
 
+
                                 lastScanRef.current =
                                     barcode;
 
 
+
                                 lastTimeRef.current =
                                     now;
+
+
 
 
 
@@ -160,14 +191,18 @@ function CameraScanner({ onScan }) {
 
 
 
+
                                 onScan(
                                     barcode
                                 );
 
 
+
                             }
 
+
                         );
+
 
 
 
@@ -179,7 +214,7 @@ function CameraScanner({ onScan }) {
             }
 
 
-            catch (error) {
+            catch(error){
 
 
                 console.error(
@@ -205,16 +240,19 @@ function CameraScanner({ onScan }) {
         return () => {
 
 
+
             try {
 
 
-                if (
+
+                if(
                     controlsRef.current
-                ) {
+                ){
 
 
                     controlsRef.current
                         .stop();
+
 
 
                     controlsRef.current =
@@ -224,14 +262,13 @@ function CameraScanner({ onScan }) {
                 }
 
 
+
             }
 
-            catch (error) {
+            catch(error){
 
 
-                console.log(
-                    error
-                );
+                console.log(error);
 
 
             }
@@ -241,7 +278,9 @@ function CameraScanner({ onScan }) {
 
 
 
+
     }, [onScan]);
+
 
 
 
@@ -249,79 +288,139 @@ function CameraScanner({ onScan }) {
 
     return (
 
+
         <div
+
             className="camera-container"
+
             style={{
-                position: "relative"
+
+                position:"relative",
+
+                width:"100%",
+
+                height:"100%"
+
             }}
+
         >
+
 
 
             <video
 
+
                 ref={videoRef}
+
+
 
                 style={{
 
-                    width: "100%",
 
-                    height: "100%",
+                    width:"100%",
 
-                    objectFit: "cover"
+
+                    height:"100%",
+
+
+                    objectFit:"cover"
+
 
                 }}
+
+
 
             />
 
 
 
+
+
             <div
+
 
                 className="scan-box"
 
+
+
                 style={{
 
-                    position: "absolute",
 
-                    top: "50%",
+                    position:"absolute",
 
-                    left: "50%",
+
+                    top:"50%",
+
+
+                    left:"50%",
+
 
                     transform:
-                        "translate(-50%,-50%)",
+                    "translate(-50%,-50%)",
 
-                    width: "80%",
 
-                    height: "120px",
+
+                    width:"80%",
+
+
+
+                    height:"120px",
+
+
 
                     border:
-                        "3px solid #00ff66",
+                    "3px solid #00ff66",
 
-                    borderRadius: "12px"
+
+
+                    borderRadius:"12px"
+
+
 
                 }}
+
+
 
             />
 
 
 
+
+
+
             <div
+
 
                 className="scan-tip"
 
+
+
                 style={{
 
-                    position: "absolute",
 
-                    bottom: "20px",
+                    position:"absolute",
 
-                    width: "100%",
 
-                    textAlign: "center",
 
-                    color: "#fff"
+                    bottom:"20px",
+
+
+
+                    width:"100%",
+
+
+
+                    textAlign:"center",
+
+
+
+                    color:"#fff"
+
+
 
                 }}
+
+
 
             >
 
@@ -332,7 +431,10 @@ function CameraScanner({ onScan }) {
 
 
 
+
+
         </div>
+
 
     );
 
