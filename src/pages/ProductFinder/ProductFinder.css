@@ -98,24 +98,6 @@
 
 /* BUTTON */
 
-.clear-btn{
-
-
-    min-width:110px;
-
-    height:42px;
-
-    margin-top:0;
-
-    padding:8px 18px;
-
-    border-radius:10px;
-
-
-    font-size:14px;
-
-
-}
 
 
 
@@ -268,9 +250,9 @@
     margin-bottom:10px;
 
 
-    border-radius:10px;
+    border-radius:15px;
 
-    font-size:14px;
+    font-size:20px;
 
 }
 
@@ -810,6 +792,63 @@ animation:slideCart .3s;
     color:white;
 
     font-size:16px;
+
+    cursor:pointer;
+
+}
+
+.scan-input-wrapper{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    width:100%;
+
+}
+
+
+.barcode-input{
+
+    flex:1;
+
+    height:42px;
+
+    border-radius:12px;
+
+    border:2px solid #333;
+
+    padding:0 15px;
+
+    font-size:16px;
+
+}
+
+
+
+.camera-btn{
+
+    width:42px;
+
+    height:42px;
+
+    border-radius:50%;
+
+    border:none;
+
+    background:#555;
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:18px;
 
     cursor:pointer;
 

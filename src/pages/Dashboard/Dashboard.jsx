@@ -1,15 +1,11 @@
 import {
-  FaBoxOpen,
-  FaBarcode,
-  FaWarehouse,
-  FaMapMarkerAlt,
   FaTruck,
   FaFileExcel,
 } from "react-icons/fa";
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import DashboardCard from "../../components/DashboardCard/DashboardCard";
 import UploadCard from "../../components/UploadCard/UploadCard";
 
 import { readExcel } from "../../services/excelService";
@@ -23,237 +19,408 @@ import {
 
 import "./Dashboard.css";
 
+
 function Dashboard() {
-  const [stats, setStats] = useState({
-    products: 0,
-    stock: 0,
-    barcode: 0,
-    locations: 0,
-  });
+
+  const navigate = useNavigate();
+
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
 
   const [files, setFiles] = useState({
     soh: null,
-    // location: null,
     shipment: null,
   });
+
 
   useEffect(() => {
     loadDashboard();
   }, []);
 
+
+
   // =============================
   // Load Dashboard
   // =============================
 
-async function loadDashboard() {
-  const soh = await getData("sohData");
-  const location = await getData("locationData");
-  const shipment = await getData("shipmentData");
-  const masterFile = await getData("productMaster");
+  async function loadDashboard() {
 
-  setFiles({
-    soh,
-    location,
-    shipment,
-  });
+    const soh = await getData("sohData");
+    const shipment = await getData("shipmentData");
 
-  // Chưa có Product Master
-  if (!masterFile) {
-    setStats({
-      products: 0,
-      stock: 0,
-      barcode: 0,
-      locations: 0,
+
+    setFiles({
+      soh,
+      shipment,
     });
-    return;
+
   }
 
-  // Hỗ trợ cả 2 kiểu lưu
-  const master =
-    masterFile.products ??
-    masterFile.data?.products ??
-    [];
 
-  if (!Array.isArray(master)) {
-    setStats({
-      products: 0,
-      stock: 0,
-      barcode: 0,
-      locations: 0,
-    });
-    return;
-  }
 
-  const totalStock = master.reduce(
-    (sum, item) => sum + Number(item.stock || 0),
-    0
-  );
-
-  const totalLocation = master.reduce(
-    (sum, item) => sum + (item.locations?.length || 0),
-    0
-  );
-
-  setStats({
-    products: master.length,
-    barcode: master.length,
-    stock: totalStock,
-    // locations: totalLocation,
-  });
-}
   // =============================
-  // Upload Function dùng chung
+  // Upload Excel
   // =============================
 
   const uploadExcel = async (file, key) => {
+
     if (!file) return;
+
 
     const excel = await readExcel(file);
 
+
     const old = await getData(key);
 
+
     const data = {
+
       fileName: file.name,
-      uploadTime: new Date().toLocaleString(),
+
+      uploadTime: new Date()
+        .toLocaleString(),
+
       rows: excel.length,
-      version: old ? old.version + 1 : 1,
+
+      version: old
+        ? old.version + 1
+        : 1,
+
       data: excel,
+
     };
 
-    await saveData(key, data);
+
+    await saveData(
+      key,
+      data
+    );
+
 
     await loadDashboard();
 
-    alert(`✅ ${file.name} Upload thành công`);
+
+    alert(
+      `✅ ${file.name} Upload thành công`
+    );
+
   };
 
-  // =============================
 
-  const handleSOH = async (e) => {
-    uploadExcel(e.target.files[0], "sohData");
+
+  const handleSOH = (e) => {
+
+    uploadExcel(
+      e.target.files[0],
+      "sohData"
+    );
+
   };
 
-  // const handleLocation = async (e) => {
-  //   uploadExcel(e.target.files[0], "locationData");
-  // };
 
-  const handleShipment = async (e) => {
-    uploadExcel(e.target.files[0], "shipmentData");
+
+  const handleShipment = (e) => {
+
+    uploadExcel(
+      e.target.files[0],
+      "shipmentData"
+    );
+
   };
+
+
 
   // =============================
   // Generate Product Master
   // =============================
 
   const handleGenerate = async () => {
-    const sohFile = await getData("sohData");
 
-if (!sohFile) {
-    alert("Chưa upload SOH");
-    return;
-}
 
-const master = generateProductMaster(
-    sohFile.data
-);
+    const sohFile = await getData(
+      "sohData"
+    );
 
-await saveProductMaster(master);
 
-await loadDashboard();
+    if (!sohFile) {
 
-    alert(`✅ Generate thành công\n${master.length} Products`);
+      alert(
+        "Chưa upload SOH"
+      );
+
+      return;
+
+    }
+
+
+
+    const master = generateProductMaster(
+      sohFile.data
+    );
+
+
+    await saveProductMaster(
+      master
+    );
+
+
+    await loadDashboard();
+
+
+
+    // Hiện popup thành công
+    setShowSuccessPopup(true);
+
   };
 
+
+
+
+  // =============================
+  // Render file info
   // =============================
 
   const renderInfo = (file) => {
+
+
     if (!file) {
+
       return (
+
         <div className="upload-info empty">
+
           Chưa upload
+
         </div>
+
       );
+
     }
 
+
+
     return (
+
       <div className="upload-info">
+
+
         <p>
-          <strong>{file.fileName}</strong>
+
+          <strong>
+            {file.fileName}
+          </strong>
+
         </p>
 
-        <p>{file.rows.toLocaleString()} Rows</p>
 
-        <p>Version {file.version}</p>
+        <p>
+          {file.rows.toLocaleString()} Rows
+        </p>
 
-        <p>{file.uploadTime}</p>
+
+        <p>
+          Version {file.version}
+        </p>
+
+
+        <p>
+          {file.uploadTime}
+        </p>
+
+
       </div>
+
     );
+
   };
 
+
+
+
+
   return (
-    
+
     <div className="dashboard-page">
-      <div className="dashboard-title">
 
-    <div>
 
-    </div>
-
-</div>
       <div className="upload-grid">
+
 
         <div>
 
+
           <UploadCard
+
             title="Upload SOH"
-            icon={<FaFileExcel color="green" />}
+
+            icon={
+              <FaFileExcel color="green" />
+            }
+
             onChange={handleSOH}
+
           />
+
 
           {renderInfo(files.soh)}
 
+
         </div>
 
-        {/* <div>
 
-          <UploadCard
-            title="Upload Location"
-            icon={<FaMapMarkerAlt color="red" />}
-            onChange={handleLocation}
-          />
 
-          {renderInfo(files.location)}
-
-        </div> */}
 
         <div>
 
+
           <UploadCard
+
             title="Upload Shipment"
-            icon={<FaTruck color="orange" />}
+
+            icon={
+              <FaTruck color="orange" />
+            }
+
             onChange={handleShipment}
+
           />
+
 
           {renderInfo(files.shipment)}
 
+
         </div>
 
+
+
       </div>
+
+
+
+
 
       <div
         style={{
-          marginTop: 40,
+          marginTop: 40
         }}
       >
+
+
         <button
+
           className="generate-btn"
+
           onClick={handleGenerate}
+
         >
+
           🚀 Xác nhận
+
         </button>
+
+
+
       </div>
+
+
+
+
+
+
+
+      {/* ===========================
+          SUCCESS POPUP
+      ============================ */}
+
+
+      {showSuccessPopup && (
+
+        <div className="popup-overlay">
+
+
+          <div className="success-popup">
+
+
+            <h2>
+              ✅ Thành công
+            </h2>
+
+
+
+            <p>
+              Product Master đã được tạo.
+            </p>
+
+
+
+            <p>
+              Bạn muốn chuyển sang tìm kiếm sản phẩm?
+            </p>
+
+
+
+
+            <div className="popup-actions">
+
+
+              <button
+
+                className="search-btn"
+
+                onClick={() => {
+
+                  setShowSuccessPopup(false);
+
+                  navigate(
+                    "/finder"
+                  );
+
+                }}
+
+              >
+
+                🔍 Tìm kiếm
+
+              </button>
+
+
+
+
+              <button
+
+                className="cancel-btn"
+
+                onClick={() =>
+                  setShowSuccessPopup(false)
+                }
+
+              >
+
+                Ở lại Dashboard
+
+              </button>
+
+
+
+            </div>
+
+
+
+          </div>
+
+
+
+        </div>
+
+      )}
+
+
+
     </div>
+
   );
+
 }
+
 
 export default Dashboard;

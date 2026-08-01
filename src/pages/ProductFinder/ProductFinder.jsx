@@ -14,7 +14,7 @@ import SelectedList from "../../components/SelectedList/SelectedList";
 
 import { FaShoppingCart } from "react-icons/fa";
 import { FaCamera } from "react-icons/fa6";
-import { FaQrcode, FaBarcode } from "react-icons/fa6";
+import { FaQrcode, FaBarcode, FaCartPlus } from "react-icons/fa6";
 
 
 import {
@@ -41,7 +41,7 @@ function ProductFinder() {
 
   const [keyword, setKeyword] = useState("");
 
-  const [status, setStatus] = useState("🟢 Ready To Scan");
+  const [status, setStatus] = useState("🟢 Sẳn sàn scan");
 
   // SKU hiện tại
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -343,39 +343,32 @@ function ProductFinder() {
       {/* ================= SEARCH ================= */}
 
       <div className="search-wrapper">
+        <div className="scan-input-wrapper">
+          <input
+            ref={inputRef}
+            className="search-input"
+            value={keyword}
+            autoFocus
+            placeholder="Scan Barcode..."
+            onChange={(e) => setKeyword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") doSearch();
+            }}
+          />
 
-        <input
-          ref={inputRef}
-          className="search-input"
-          value={keyword}
-          autoFocus
-          placeholder="Scan Barcode..."
-          onChange={(e) => setKeyword(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") doSearch();
-          }}
-        />
-
-        <button
-          className="camera-btn"
-          onClick={() => setCameraMode(!cameraMode)}
-        >
-          {
-            cameraMode
-              ?
-              <FaQrcode />
-              :
-              <FaBarcode />
-          }
-        </button>
-
-        {/* <button
-          className="clear-btn"
-          onClick={clearSearch}
-        >
-          Xóa
-        </button> */}
-
+          <button
+            className="camera-btn"
+            onClick={() => setCameraMode(!cameraMode)}
+          >
+            {
+              cameraMode
+                ?
+                <FaQrcode />
+                :
+                <FaBarcode />
+            }
+          </button>
+        </div>
       </div>
 
       {/* ================= CAMERA ================= */}
@@ -484,22 +477,22 @@ function ProductFinder() {
                   {item.color}
 
                 </button>
-                
+
 
               ))}
-              
+
 
             </div>
 
           </div>
 
-                    <div className="add-list-wrapper">
+          <div className="add-list-wrapper">
 
             <button
               className="add-list-btn"
               onClick={() => addToList(selectedProduct)}
             >
-              ➕ Thêm vào danh sách
+              <FaCartPlus /> Thêm vào danh sách
             </button>
 
           </div>
