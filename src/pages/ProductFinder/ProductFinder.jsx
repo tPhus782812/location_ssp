@@ -420,16 +420,6 @@ function ProductFinder() {
             product={selectedProduct}
             totalStock={totalStock}
           />
-          <div className="add-list-wrapper">
-
-            <button
-              className="add-list-btn"
-              onClick={() => addToList(selectedProduct)}
-            >
-              ➕ Thêm vào danh sách
-            </button>
-
-          </div>
 
           {/* ================= SIZE ================= */}
 
@@ -494,10 +484,23 @@ function ProductFinder() {
                   {item.color}
 
                 </button>
+                
 
               ))}
+              
 
             </div>
+
+          </div>
+
+                    <div className="add-list-wrapper">
+
+            <button
+              className="add-list-btn"
+              onClick={() => addToList(selectedProduct)}
+            >
+              ➕ Thêm vào danh sách
+            </button>
 
           </div>
 
