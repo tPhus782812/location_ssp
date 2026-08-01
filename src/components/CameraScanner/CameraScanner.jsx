@@ -1,3 +1,4 @@
+import {FaCameraRotate} from "react-icons/fa6";
 import {
     BrowserMultiFormatReader
 } from "@zxing/browser";
@@ -9,7 +10,8 @@ import {
 
 import {
     useEffect,
-    useRef
+    useRef,
+    useState
 } from "react";
 
 
@@ -20,7 +22,7 @@ function CameraScanner({ onScan }) {
 
     const controlsRef = useRef(null);
 
-    const startedRef = useRef(false);
+    const readerRef = useRef(null);
 
     const lastScanRef = useRef("");
 
@@ -28,248 +30,185 @@ function CameraScanner({ onScan }) {
 
 
 
-    useEffect(() => {
-
-
-        // tránh React StrictMode mở camera 2 lần
-        if (startedRef.current) return;
-
-
-        startedRef.current = true;
+    const [cameraMode, setCameraMode] =
+        useState("environment");
 
 
 
-        const hints = new Map();
+    async function startScanner(mode) {
+
+
+        try {
+
+
+            if(controlsRef.current){
+
+                controlsRef.current.stop();
+
+            }
 
 
 
-        hints.set(
-            DecodeHintType.POSSIBLE_FORMATS,
-            [
-
-                BarcodeFormat.CODE_128,
-
-                BarcodeFormat.EAN_13,
-
-                BarcodeFormat.EAN_8,
-
-                BarcodeFormat.CODE_39,
-
-                BarcodeFormat.UPC_A,
-
-                BarcodeFormat.UPC_E
-
-            ]
-        );
+            const hints = new Map();
 
 
+            hints.set(
+                DecodeHintType.POSSIBLE_FORMATS,
+                [
+                    BarcodeFormat.CODE_128,
+                    BarcodeFormat.EAN_13,
+                    BarcodeFormat.EAN_8,
+                    BarcodeFormat.CODE_39,
+                    BarcodeFormat.UPC_A,
+                    BarcodeFormat.UPC_E
+                ]
+            );
 
-        hints.set(
-            DecodeHintType.TRY_HARDER,
-            true
-        );
 
-
-
-        const codeReader =
-            new BrowserMultiFormatReader(
-                hints
+            hints.set(
+                DecodeHintType.TRY_HARDER,
+                true
             );
 
 
 
+            const codeReader =
+                new BrowserMultiFormatReader(
+                    hints
+                );
 
 
-        async function startScanner() {
+            readerRef.current =
+                codeReader;
 
 
-            try {
 
 
-                const constraints = {
+            const controls =
+                await codeReader.decodeFromConstraints(
 
 
-                    video: {
+                    {
 
+                        video:{
 
-                        // ép dùng camera sau
-                        facingMode: {
-                            ideal: "environment"
-                        },
+                            facingMode:{
+                                ideal: mode
+                            },
 
+                            width:{
+                                ideal:1280
+                            },
 
-                        width: {
-                            ideal: 1280
-                        },
+                            height:{
+                                ideal:720
+                            }
 
-
-                        height: {
-                            ideal: 720
                         }
+
+                    },
+
+
+                    videoRef.current,
+
+
+                    (result)=>{
+
+
+                        if(!result)
+                            return;
+
+
+
+                        const code =
+                            result.getText();
+
+
+
+                        const now =
+                            Date.now();
+
+
+
+                        if(
+
+                            code ===
+                            lastScanRef.current
+
+                            &&
+
+                            now -
+                            lastTimeRef.current
+                            <
+                            1500
+
+                        ){
+
+                            return;
+
+                        }
+
+
+
+                        lastScanRef.current =
+                            code;
+
+
+                        lastTimeRef.current =
+                            now;
+
+
+
+                        navigator.vibrate?.(60);
+
+
+                        onScan(code);
 
 
                     }
 
 
-                };
-
-
-
-
-                const controls =
-                    await codeReader
-                        .decodeFromConstraints(
-
-
-                            constraints,
-
-
-                            videoRef.current,
-
-
-                            (result, error) => {
-
-
-
-                                if (!result)
-                                    return;
-
-
-
-
-                                const barcode =
-                                    result.getText();
-
-
-
-
-                                const now =
-                                    Date.now();
-
-
-
-
-                                // chống quét lặp
-                                if (
-
-                                    barcode ===
-                                    lastScanRef.current
-
-                                    &&
-
-                                    now -
-                                    lastTimeRef.current
-                                    <
-                                    1500
-
-                                ) {
-
-                                    return;
-
-                                }
-
-
-
-
-                                lastScanRef.current =
-                                    barcode;
-
-
-
-                                lastTimeRef.current =
-                                    now;
-
-
-
-
-
-                                navigator
-                                    .vibrate
-                                    ?.(
-                                        60
-                                    );
-
-
-
-
-                                onScan(
-                                    barcode
-                                );
-
-
-
-                            }
-
-
-                        );
-
-
-
-
-                controlsRef.current =
-                    controls;
-
-
-
-            }
-
-
-            catch(error){
-
-
-                console.error(
-                    "Camera error:",
-                    error
                 );
 
 
-            }
+
+            controlsRef.current =
+                controls;
 
 
         }
 
+        catch(error){
+
+            console.log(
+                "Camera error",
+                error
+            );
+
+        }
+
+    }
 
 
 
-        startScanner();
+
+    useEffect(()=>{
+
+
+        startScanner(
+            cameraMode
+        );
 
 
 
+        return()=>{
 
 
-        return () => {
+            if(
+                controlsRef.current
+            ){
 
-
-
-            try {
-
-
-
-                if(
-                    controlsRef.current
-                ){
-
-
-                    controlsRef.current
-                        .stop();
-
-
-
-                    controlsRef.current =
-                        null;
-
-
-                }
-
-
-
-            }
-
-            catch(error){
-
-
-                console.log(error);
-
+                controlsRef.current.stop();
 
             }
 
@@ -277,9 +216,27 @@ function CameraScanner({ onScan }) {
         };
 
 
+    },[cameraMode]);
 
 
-    }, [onScan]);
+
+
+
+
+    function changeCamera(){
+
+
+        setCameraMode(
+            prev =>
+                prev === "environment"
+                ?
+                "user"
+                :
+                "environment"
+        );
+
+
+    }
 
 
 
@@ -289,142 +246,35 @@ function CameraScanner({ onScan }) {
     return (
 
 
-        <div
-
-            className="camera-container"
-
-            style={{
-
-                position:"relative",
-
-                width:"100%",
-
-                height:"100%"
-
-            }}
-
-        >
+        <div className="scanner-wrapper">
 
 
 
             <video
 
-
                 ref={videoRef}
 
-
-
-                style={{
-
-
-                    width:"100%",
-
-
-                    height:"100%",
-
-
-                    objectFit:"cover"
-
-
-                }}
-
-
+                className="scanner-video"
 
             />
 
 
 
 
+            <div className="scanner-header">
 
-            <div
 
+                <button
 
-                className="scan-box"
+                    className="camera-btn"
 
+                    onClick={changeCamera}
 
+                >
 
-                style={{
+                    <FaCameraRotate />
 
-
-                    position:"absolute",
-
-
-                    top:"50%",
-
-
-                    left:"50%",
-
-
-                    transform:
-                    "translate(-50%,-50%)",
-
-
-
-                    width:"80%",
-
-
-
-                    height:"120px",
-
-
-
-                    border:
-                    "3px solid #00ff66",
-
-
-
-                    borderRadius:"12px"
-
-
-
-                }}
-
-
-
-            />
-
-
-
-
-
-
-            <div
-
-
-                className="scan-tip"
-
-
-
-                style={{
-
-
-                    position:"absolute",
-
-
-
-                    bottom:"20px",
-
-
-
-                    width:"100%",
-
-
-
-                    textAlign:"center",
-
-
-
-                    color:"#fff"
-
-
-
-                }}
-
-
-
-            >
-
-                Đưa barcode vào vùng quét
+                </button>
 
 
             </div>
@@ -433,11 +283,32 @@ function CameraScanner({ onScan }) {
 
 
 
+            <div className="scan-frame">
+
+
+                <div className="scan-line"/>
+
+
+            </div>
+
+
+
+
+
+            {/* <div className="scan-tip">
+
+
+                Đưa barcode vào giữa khung
+
+
+            </div> */}
+
+
+
         </div>
 
 
     );
-
 
 }
 

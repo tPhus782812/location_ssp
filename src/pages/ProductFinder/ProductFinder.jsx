@@ -354,7 +354,7 @@ function ProductFinder() {
           className="camera-btn"
           onClick={() => setCameraMode(!cameraMode)}
         >
-          {cameraMode ? "📷 Đóng Camera" : "📷 Mở Camera"}
+          {cameraMode ? " Đóng " : " Mở "}
         </button>
 
         {/* <button
